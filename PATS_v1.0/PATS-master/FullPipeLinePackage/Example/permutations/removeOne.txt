@@ -1,0 +1,3 @@
+Thermus_aquaticus_Y51MC23.498848.fasta
+Thermus_oshimai_JL-2.751945.fasta
+Thermus_parvatiensis.456163.fasta
