@@ -1,0 +1,2 @@
+Thermus_oshimai_JL-2.751945.fasta
+Thermus_parvatiensis.456163.fasta

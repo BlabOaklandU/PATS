@@ -1,0 +1,519 @@
+<html lang="de">
+<head>
+<meta charset="utf-8"/>
+
+<style>
+*[tooltip] {
+ position:relative
+}
+*[tooltip]:hover:after {
+ background:rgba(0,0,0,0.9);
+ border-radius:5px 5px 5px 0;
+ bottom:23px;
+ color:#fff;
+ content:attr(tooltip);
+ padding:10px 5px;
+ position:absolute;
+ z-index:98;
+ right:-165px;
+ width:330px;
+ text-shadow:none;
+ font-size:12px;
+ line-height:1.5em;
+ cursor:default
+}
+*[tooltip]:hover:before {
+ border:solid;
+ border-color:#222 transparent;
+ border-width:6px 6px 0;
+ bottom:17px;
+ content:'';
+ left:2px;
+ position:absolute;
+ z-index:99;
+ cursor:default
+}
+.tooltip-element {
+ visibility:visible;
+ color:#fff;
+ background:#000;
+ width:16px;
+ height:16px;
+ border-radius:8px;
+ display:inline-block;
+ text-align:center;
+ line-height:16px;
+ margin:0 5px;
+ font-size:12px;
+ cursor:default
+}
+
+.fb-checkbox-inline,
+.fb-radio-inline {
+ margin-right:8px;
+ display:inline-block;
+ vertical-align:middle;
+ padding-left:0
+}
+.fb-checkbox-group input[type='checkbox'],
+.fb-checkbox-group input[type='radio'],
+.fb-radio-group input[type='checkbox'],
+.fb-radio-group input[type='radio'] {
+ margin:0 4px 0 0
+}
+button,
+input,
+select,
+textarea {
+ font-family:inherit;
+ font-size:inherit;
+ line-height:inherit
+}
+input {
+ line-height:normal
+}
+textarea {
+ overflow:auto
+}
+button,
+input,
+select,
+textarea {
+  margin-left:3px;
+  margin-right:3px;
+ font-family:inherit;
+ font-size:inherit;
+ line-height:inherit
+}
+input[type='number'], input[type='text']{
+  margin-top: 5px;
+  width: 90px;
+  border: none;  
+   border-radius: 3px;
+  border: 2px solid rgba(0,100,0,0.3);
+}
+input[type='text']{
+  min-width: 300px;
+}
+input:invalid {
+  border: 2px solid red ;
+  background-color: rgba(255,0,0,0.3);
+}
+input:disabled {
+  border: 2px solid gray ; 
+  background-color: rgba(50,50,50,0.3);
+}
+* {
+  font-family: Roboto;
+}
+.form-group {
+ margin-left:0px;
+ margin-bottom:15px
+}
+.container
+{
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     top:0;
+}
+.item
+{
+     background-color: #f3f2ef;
+     border-radius: 3px;
+     width: 90%; 
+}
+.rendered-form{
+  margin:20px;
+}
+textarea{
+  width:95%;
+  margin:0;
+  border:0;
+  background-color:black;
+  color:white;
+  text-shadow: 0 0 5px #C8C8C8;
+  font: 1.1rem Inconsolata, monospace;
+    display: inline-block;
+    vertical-align: top; /* here */
+}
+textarea::selection {
+  background: #0080FF;
+  text-shadow: none;
+}
+*{
+ font-family: 'Montserrat', sans-serif;
+}
+.terminalcontainer{
+  font: 1rem Inconsolata, monospace;
+  width:100%;
+  display: inline-block;
+  float:top;
+  background-color:black;
+  color:white;
+
+    user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+}
+
+.terminali{
+  margin:2px;
+  
+  text-shadow: 0 0 5px #C8C8C8;
+  font: 1.1rem Inconsolata, monospace;
+    display: inline-block;
+    vertical-align: top; /* here */
+}
+.fastaselect{
+  right:5%;
+  margin-top:10px;
+  position:absolute;
+}
+
+</style>
+
+</head>
+<body>
+<form class="fastaselect" onchange="updateTerminal()">Select FASTA (fna,faa) files (shift): <input type="file" id="fasta" name="fastafiles" multiple>
+</form>
+<div class="container"><div class="item">
+<form id="formMain" onchange="updateTerminal()" onkeyup="updateTerminal()">
+  <div class="rendered-form">
+<h1 id="control-3667383">Proteinortho Helper</h1>
+
+The resulting proteinortho command (replace proteinortho with 'perl proteinortho6.pl' for a local execution):
+<div><div class="terminalcontainer"><div class="terminali">$</div><textarea id="terminal" rows="3" onclick="this.focus();this.select()" readonly="readonly">proteinortho</textarea></div><button onclick="copytoCB()" type="button">Copy text to clipboard</button> 
+<!-- <button id="dummybutton">Check form for errors</button>  -->
+</div>
+<hr>
+<div class=""><h2 id="control-6812094">Main parameters</h2></div>
+<hr><br>
+
+<div class="fb-radio-group form-group field-step"><label for="step" class="fb-radio-group-label"><b>-<b</>step</b></label>
+  <div class="radio-group">
+  <div class="fb-radio-inline"><input name="step" id="step-0" value="0" type="radio" checked="checked"><label for="step-0">Do all steps (1-3)</label></div>
+<div class="fb-radio-inline"><input name="step" id="step-1" value="1" type="radio"><label for="step-1">1: Build Databases</label></div>
+<div class="fb-radio-inline"><input name="step" id="step-2" value="2" type="radio"><label for="step-2">2: All versus all blast</label></div>
+<div class="fb-radio-inline"><input name="step" id="step-3" value="3" type="radio"><label for="step-3">3: Clustering</label></div></div></div>
+
+<div class="fb-text form-group field-project"><label for="project" class="fb-text-label"><b>-project</b> : prefix for all resulting file names</label><br>&nbsp;&nbsp;&nbsp;&nbsp;<input pattern="[^- ]*" type="text" class="form-control" name="project" value="myproject" id="project"></div>
+<div class="fb-number form-group field-cpus"><label for="cpus" class="fb-number-label"><b>-cpus</b> : the number of processors/ threads</label><br>&nbsp;&nbsp;&nbsp;&nbsp;<input type="number" placeholder="auto detect all available" class="form-control" name="cpus" min="1" step="1" id="cpus"></div>
+<div class="fb-number form-group field-ram"><label for="ram" class="fb-number-label"><b>-ram</b> : maximal ram threshold for LAPACK and the input graph in MB. auto-detect : use 90% of free memory available</label><br>&nbsp;&nbsp;&nbsp;&nbsp;<input type="number" placeholder="auto detect 90% of free memory" class="form-control" name="ram" min="1" step="1" id="ram">MB</div>
+<div class="fb-radio-group form-group field-verbose"><label for="verbose" class="fb-radio-group-label"><b>-verbose</b> : the verbosity level<span class="tooltip-element" tooltip="1: keeps you informed about the progress, 2: a lot of additional informations are printed out">?</span></label>
+  <div class="radio-group">
+  <div class="fb-radio-inline"><input name="verbose" id="verbose-0" value="0" type="radio"><label for="verbose-0">0</label></div>
+<div class="fb-radio-inline"><input name="verbose" id="verbose-1" value="1" type="radio" checked><label for="verbose-1">1</label></div>
+<div class="fb-radio-inline"><input name="verbose" id="verbose-2" value="2" type="radio"><label for="verbose-2">2</label></div></div></div>
+<div class="fb-checkbox-group form-group field-additionalFlags1"><label for="additionalFlags1" class="fb-checkbox-group-label">Additional Flags</label>
+  <div class="checkbox-group">
+
+<div class="fb-checkbox"><input name="additionalFlags1[]" id="selfblast" value="selfblast" type="checkbox"><label for="additionalFlags1-00"><b>-selfblast</b> : apply selfblast, detects paralogs without orthologs.</label></div>
+
+  <div class="fb-checkbox"><input name="additionalFlags1[]" id="silent" value="silent" type="checkbox"><label for="additionalFlags1-0"><b>-silent</b> : verbosity level 0</label></div>
+<div class="fb-checkbox"><input name="additionalFlags1[]" id="clean" value="clean" type="checkbox"><label for="additionalFlags1-1"><b>-clean</b> : removes all database-index-files generated by the -p algorithm afterwards.</label></div>
+<div class="fb-checkbox"><input name="additionalFlags1[]" id="keep" value="keep" type="checkbox"><label for="additionalFlags1-5"><b>-keep</b> : save all intermediate results (inside the folder: *proteinortho_cache/).</label></div>
+<div class="fb-checkbox"><input name="additionalFlags1[]" id="force" value="force" type="checkbox"><label for="additionalFlags1-2"><b>-force</b> : forces the recalculation of the blast results in any case in step=2 and the rebuilding of the databases in step=1.</label></div>
+<div class="fb-checkbox"><input name="additionalFlags1[]" id="desc" value="desc" type="checkbox"><label for="additionalFlags1-3"><b>-desc</b> : write description files (for NCBI FASTA input only)</label></div>
+<div class="fb-checkbox"><input name="additionalFlags1[]" id="cleanblast" value="cleanblast" type="checkbox"><label for="additionalFlags1-7"><b>-cleanblast</b> : cleans blast-graph with proteinortho_cleanupblastgraph (either generated in step 2 or loaded in step 3)</label></div>
+<div class="fb-checkbox"><input name="additionalFlags1[]" id="debug" value="debug" type="checkbox"><label for="additionalFlags1-4"><b>-debug</b></label></div></div></div>
+<div class="fb-text form-group field-binpath"><label for="binpath" class="fb-text-label"><b>-<strong>binpath</strong></b> : path to your local executables (blast, diamond, mcl, ...), e.g. /home/paul/bin/</label><br>&nbsp;&nbsp;&nbsp;&nbsp;<input pattern="[/.~][^- ]*" type="text" placeholder="everything specified in $PATH" class="form-control" name="binpath" id="binpath" title="specify a local bin directory e.g. /home/paul/bin/ "></div>
+<div class="fb-text form-group field-tmp"><label for="tmp" class="fb-text-label"><b>-<strong>tmp</strong></b> : path to the temporary files. E.g. /tmp/ or to a proteinortho_cache_* directory of a previous run (use the -keep option).</label><br>&nbsp;&nbsp;&nbsp;&nbsp;<input pattern="[/.~][^- ]*" type="text" placeholder="current working directory" class="form-control" name="tmp" id="tmp" title="path to the temporary files. E.g. /tmp/ "></div>
+
+<br><hr>
+<div class=""><h2 id="control-3626304"><b>Search</b> options (step 1-2)</h2></div>
+<hr><br>
+
+<div class="fb-radio-group form-group field-p"><label for="p" class="fb-radio-group-label"><b>-p</b> : the underlying algorithm for the all-versus-all search. The algorithm has to be installed on your system (try calling from the command line, e.g. "diamond"). If you want to point proteinortho to your binaries, use -binpath.</label>
+  <div class="radio-group">
+  <div class="fb-radio"><input name="p" id="p-0" value="blastn" type="radio"><label for="p-0">blast+ (nucleotides) <a href="https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastDocs&DOC_TYPE=Download">homepage</a></label></div>
+<div class="fb-radio"><input name="p" id="p-1" value="blastp" type="radio"><label for="p-1">blast+ (proteins)</label></div>
+<div class="fb-radio"><input name="p" id="p-2" value="tblastx" type="radio"><label for="p-2">tblastx</label></div>
+<div class="fb-radio"><input name="p" id="p-3" value="diamond" type="radio" checked><label for="p-3">diamond (proteins) <a href="https://github.com/bbuchfink/diamond">homepage</a></label></div>
+<div class="fb-radio"><input name="p" id="p-4" value="lastn" type="radio"><label for="p-4">last (nucleotides) <a href="http://last.cbrc.jp/">homepage</a></label></div>
+<div class="fb-radio"><input name="p" id="p-5" value="lastp" type="radio"><label for="p-5">last (proteins)</label></div>
+<div class="fb-radio"><input name="p" id="p-6" value="rapsearch" type="radio"><label for="p-6">rapsearch2 (proteins) <a href="https://github.com/zhaoyanswill/RAPSearch2">homepage</a></label></div>
+<div class="fb-radio"><input name="p" id="p-7" value="mmseqsp" type="radio"><label for="p-7">mmseqs2 (proteins) <a href="https://github.com/soedinglab/MMseqs2">homepage</a></label></div>
+<div class="fb-radio"><input name="p" id="p-8" value="mmseqsn" type="radio"><label for="p-8">mmseqs2 (nucleotide)</label></div>
+<div class="fb-radio"><input name="p" id="p-9" value="topaz" type="radio"><label for="p-9">topaz (proteins) <a href="https://github.com/ajm/topaz">homepage</a></label></div>
+<div class="fb-radio"><input name="p" id="p-10" value="usearch" type="radio"><label for="p-10">usearch (proteins) <a href="https://www.drive5.com/usearch/download.html">homepage</a></label></div>
+<div class="fb-radio"><input name="p" id="p-11" value="ublast" type="radio"><label for="p-11">ublast (proteins)</label></div>
+<div class="fb-radio"><input name="p" id="p-12" value="blatp" type="radio"><label for="p-12">blat (proteins) <a href="http://hgdownload.soe.ucsc.edu/admin/">homepage</a></label></div>
+<div class="fb-radio"><input name="p" id="p-13" value="blatn" type="radio"><label for="p-13">blat (nucleotides)</label></div></div></div>
+<div class="fb-number form-group field-e"><label for="e" class="fb-number-label"><b>-e</b> : evalue threshold for the search algorithm. Increasing this threshold will result in more hits (be careful of false positives).</label><br>&nbsp;&nbsp;&nbsp;&nbsp;<input type="number" class="form-control" name="e" value="1e-05" min="0" step="any" id="e"></div>
+<div class="fb-number form-group field-sim"><label for="sim" class="fb-number-label"><b>-sim</b> : minimal similarity threshold for additional hits. The RBH (reciprocal best hit blast graph) only contains the best/maximal hits between two species, this corresponds to -sim=1. With 0.95 the best 5% are taken (adaptive RBH).</label><br>&nbsp;&nbsp;&nbsp;&nbsp;<input type="number" class="form-control" name="sim" value="0.95" min="0" max="1" step="any" id="sim" title="min. similarity for additional hits"></div>
+<div class="fb-number form-group field-identity"><label for="identity" class="fb-number-label"><b>-identity</b> : min. percent identity of best blast hits in %</label><br>&nbsp;&nbsp;&nbsp;&nbsp;<input type="number" class="form-control" name="identity" value="25" min="0" step="any" max="100" id="identity"></div>
+<div class="fb-number form-group field-cov"><label for="cov" class="fb-number-label"><b>-cov</b> : min. coverage of best blast alignments in %</label><br>&nbsp;&nbsp;&nbsp;&nbsp;<input type="number" class="form-control" name="cov" value="50" min="0" step="any" max="100" id="cov"></div>
+<div class="fb-text form-group field-subparaBlast"><label for="subparaBlast" class="fb-text-label"><b>-subparaBlast</b> : additional parameters for the search tool(-p). Careful when changing -p, then this option may lead to errors.<span class="tooltip-element" tooltip="example -subpara='-seg no' for -p=blastp+ or -subpara='--more-sensitive' for -p=diamond. Do not use '=' here!">?</span></label><br>&nbsp;&nbsp;&nbsp;&nbsp;'<input type="text" pattern="[^'=]+" class="form-control" name="subparaBlast" id="subparaBlast" title="example -subpara='-seg no' or -subpara='--more-sensitive' for diamond. Do not use '=' here!">'</div>
+<div class="fb-checkbox"><input name="additionalFlags1[]" id="checkfasta" value="checkfasta" type="checkbox"><label for="additionalFlags1-6"><b>-checkfasta</b> : checks if the given algorithm (-p) can process the input fasta file.</label></div>
+<br><hr>
+<div class=""><h2 id="control-5359817"><b>Synteny</b> options (optional, step 2)</h2></div>
+<hr><br>
+
+<div class="fb-checkbox-group form-group field-synteny">
+<!-- 
+<details>
+  <summary>(Click to expand)</summary>
+   -->
+<div class="checkbox-group">
+  <div class="fb-checkbox"><input name="synteny[]" id="synteny-0" value="synteny" type="checkbox"><label for="synteny-0"><b>-synteny</b> : activate PoFF extension to separate similar by contextual adjacencies. Requires a .gff for each .fasta in the same directory with same names.</label></div></div></div>
+<div class="fb-number form-group field-dups"><label for="dups" class="fb-number-label"><b>-dups</b> : number of reiterations for adjacencies heuristic, to determine
+duplicated regions</label><br>&nbsp;&nbsp;&nbsp;&nbsp;<input type="number" class="form-control" name="dups" value="0" min="0" step="1" id="dups" disabled></div>
+<div class="fb-number form-group field-cs"><label for="cs" class="fb-number-label"><b>-cs</b> : Size of a maximum common substring (MCS) for adjacency matches</label><br>&nbsp;&nbsp;&nbsp;&nbsp;<input type="number" class="form-control" name="cs" value="3" min="0" step="1" id="cs" disabled></div>
+<div class="fb-number form-group field-alpha"><label for="alpha" class="fb-number-label"><b>-alpha</b> : weight of adjacencies vs. sequence similarity</label><br>&nbsp;&nbsp;&nbsp;&nbsp;<input type="number" class="form-control" name="alpha" value="0.5" min="0" step="any" max="1" id="alpha" disabled></div>
+<!-- </details> -->
+<br><hr>
+<div class=""><h2 id="control-7134730"><b>Clustering</b> options (step 3)</h2></div>
+<hr><br>
+<!-- 
+<details>
+  <summary>(Click to expand)</summary>
+ -->
+ <div class="fb-number form-group field-conn"><label for="conn" class="fb-number-label"><b>-conn</b> : minimal required algebraic connectivity for each connected component/group. This is the main parameter for the clustering algorithm. The higher this value, the more splits are made.</label><br>&nbsp;&nbsp;&nbsp;&nbsp;<input type="number" class="form-control" name="conn" value="0.1" min="0" step="any" id="conn"></div>
+<div class="fb-number form-group field-purity"><label for="purity" class="fb-number-label"><b>-purity</b> : avoid spurious graph assignments by increasing this value</label><br>&nbsp;&nbsp;&nbsp;&nbsp;<input type="number" class="form-control" name="purity" value="1e-7" step="any" min="0" id="purity"></div>
+
+<div class="fb-number form-group field-minspecies"><label for="minspecies" class="fb-number-label"><b>-minspecies</b> : minimal number of genes per species for each group. If a group is found with up to (minspecies) genes/species, it wont be split again (regardless of the connectivity). A value of 0 is always satisfied.</label><br>&nbsp;&nbsp;&nbsp;&nbsp;<input type="number" class="form-control" name="minspecies" value="1" min="0" step="any" id="minspecies" title="If a group is found with up to (minspecies) genes/species, it wont be split again (regardless of the connectivity)."></div>
+<div class="fb-text form-group field-subparaCluster"><label for="subparaCluster" class="fb-text-label"><b>-subparaCuster</b> : additional parameters for the clustering algorithm<span class="tooltip-element" tooltip="example -subparaCluster='-maxnodes 10000'. Note: -rmgraph cannot be set. All other parameters of subparaCluster are replacing the default values (like -cpus or -minSpecies). Do not use '=' here!">?</span></label><br>&nbsp;&nbsp;&nbsp;&nbsp;'<input type="text" class="form-control" pattern="[^'=]+" name="subparaCluster" id="subparaCluster" title="example -subparaCluster='-maxnodes 10000'. Note: -rmgraph cannot be set. All other parameters of subparaCluster are replacing the default values (like -cpus or -minSpecies). Do not use '=' here!">'</div>
+<div class="fb-checkbox-group form-group field-additionalFlags2"><label for="additionalFlags2" class="fb-checkbox-group-label">Additional Flags</label>
+  <div class="checkbox-group">
+  <div class="fb-checkbox"><input name="additionalFlags2[]" id="nograph" value="nograph" type="checkbox"><label for="additionalFlags2-0"><b>-nograph</b> : do not generate the pairwise orthology relations file (*-graph).</label></div>
+<div class="fb-checkbox"><input name="additionalFlags2[]" id="singles" value="singles" type="checkbox"><label for="additionalFlags2-1"><b>-singles</b> : report groups only containing a single genes without any hits.</label></div>
+<div class="fb-checkbox"><input name="additionalFlags2[]" id="xml" value="xml" type="checkbox"><label for="additionalFlags2-2"><b>-xml</b> : do generate an orthoXML file (<a href="http://www.orthoxml.org">www.orthoxml.org</a>). You can also use proteinortho2xml.pl.</label></div>
+<div class="fb-checkbox"><input name="additionalFlags2[]" id="mcl" value="mcl" type="checkbox"><label for="additionalFlags2-3"><b>-mcl</b> : enables the mcl algorithm for clustering instead of power iteration + lapack. (needs mcl to be installed, call 'mcl' to test if you installed mcl correctly)</label></div>
+<div class="fb-checkbox"><input name="additionalFlags2[]" id="exactstep3" value="exactstep3" type="checkbox"><label for="additionalFlags2-4"><b>-exactstep3</b> : perform the clustering without the k-mere heuristic. The k-mere heuristic is only applied for very large connected components (>1e+6 nodes) and if the algorithm would start to iteratate very slowly.</label></div></div></div>
+<!-- </details> -->
+<hr>
+<div class=""><h2 id="control-522525">Options for <b>large compute jobs</b></h2></div>
+<hr><br>
+<div class="fb-text form-group field-jobs"><label for="jobs" class="fb-text-label"><b>-jobs</b> : If you want to involve multiple machines or separate a Proteinortho
+run into smaller chunks, use the -jobs=<strong>M</strong>/<strong>N</strong> option. First, run 'proteinortho6.pl -steps=1 ...' to generate the indices. Then you can run 'proteinortho6.pl -steps=2 -jobs=M/N ...' to run small chunks separately. Instead of M and N numbers must be set representing the number of jobs you want to divide the run into (M) and the job division to be performed by the process. E.g. to divide a Proteinortho run into 4 jobs to run on several machines, use 'proteinortho6.pl -steps=2 -jobs=1/4', 'proteinortho6.pl -steps=2 -jobs=1/4', 'proteinortho6.pl -steps=2 -jobs=2/4', 'proteinortho6.pl -steps=2 -jobs=3/4', 'proteinortho6.pl -steps=2 -jobs=4/4'.</label><br>&nbsp;&nbsp;&nbsp;&nbsp;N =<input min="1" step="1" type="number" placeholder="N" class="form-control" name="jobs" id="jobs" title="First, run 'proteinortho6.pl -steps=1 ...' to generate the indices. Then you can run 'proteinortho6.pl -steps=2 -jobs=M/N ...' to run small chunks separately. Instead of M and N numbers must be set representing the number of jobs you want to divide the run into (M) and the job division to be performed by the process. E.g. to divide a Proteinortho run into 4 jobs to run on several machines, use 'proteinortho6.pl -steps=2 -jobs=1/4', 'proteinortho6.pl -steps=2 -jobs=1/4', 'proteinortho6.pl -steps=2 -jobs=2/4', 'proteinortho6.pl -steps=2 -jobs=3/4', 'proteinortho6.pl -steps=2 -jobs=4/4'."> (only available for -step=2)</div></div></form>
+</div></div>
+</body>
+<script type="text/javascript">
+  function copytoCB() {
+    var form = document.getElementById('formMain');
+    var triggerButton = document.getElementById('dummybutton');
+  if (form.checkValidity()) {
+      var copyText = document.getElementById("terminal");
+    copyText.select();
+
+      document.execCommand("copy");
+
+      // /* Alert the copied text */
+     alert("Copied to clipboard!");
+     // preventDefault();
+
+    } else {
+      document.getElementById("dummybutton").click();
+    }
+    
+  } 
+  function updateTerminal(){
+
+    var fastas=" FASTAFILES";
+    for(var f in document.getElementById('fasta').files){
+      if(f!="length" && f!= "item" && f>=0 ){
+        if(fastas==" FASTAFILES"){
+          fastas="";
+        }
+        fastas+=" "+document.getElementById('fasta').files[f].name;
+      }
+    }
+
+    var output="proteinortho";
+
+    var step0=document.getElementById('step-0').checked;
+    var step1=document.getElementById('step-1').checked;
+    var step2=document.getElementById('step-2').checked;
+    var step3=document.getElementById('step-3').checked;
+
+    if(step1){output+=" -step=1";}
+    else if(step2){output+=" -step=2";}
+    else if(step3){output+=" -step=3";}
+
+    var project=document.getElementById('project').value;
+    
+    if(project !="myproject" && project != ""){output+=" -project="+project;}
+
+    var cpus=document.getElementById('cpus').value;
+
+    if(cpus != ""){output+=" -cpus="+cpus;}
+
+    var ram=document.getElementById('ram').value;
+    
+    if(ram != ""){output+=" -ram="+ram;}
+
+    var verbose0=document.getElementById('verbose-0').checked;
+    var verbose1=document.getElementById('verbose-1').checked;
+    var verbose2=document.getElementById('verbose-2').checked;
+
+    if(verbose0){output+=" -verbose=0";}
+    else if(verbose2){output+=" -verbose=2";}
+
+    var selfblast=document.getElementById('selfblast').checked;
+    
+    if(selfblast != ""){output+=" -selfblast";}
+
+    var silent=document.getElementById('silent').checked;
+    
+    if(silent != ""){output+=" -silent";}
+
+    var keep=document.getElementById('keep').checked;
+
+    if(keep != ""){output+=" -keep";}
+
+    var force=document.getElementById('force').checked;
+    if(force != ""){output+=" -force";}
+
+    var desc=document.getElementById('desc').checked;
+    if(desc != ""){output+=" -desc";}
+
+    var checkfasta=document.getElementById('checkfasta').checked;
+    if(checkfasta != ""){output+=" -checkfasta";}
+
+    var cleanblast=document.getElementById('cleanblast').checked;
+    if(cleanblast != ""){output+=" -cleanblast";}
+
+    var debug=document.getElementById('debug').checked;
+    if(debug != ""){output+=" -debug";}
+
+    var binpath=document.getElementById('binpath').value;
+    if(binpath != ""){output+=" -binpath='"+binpath+"'";}
+
+    var tmp=document.getElementById('tmp').value;
+    if(tmp != ""){output+=" -tmp='"+tmp+"'";}
+
+    var p0=document.getElementById('p-0').checked;
+    if(p0){output+=" -p=blastn+";}
+
+    var p1=document.getElementById('p-1').checked;
+    if(p1){output+=" -p=blastp+";}
+
+    var p2=document.getElementById('p-2').checked;
+    if(p2){output+=" -p=tblastx+";}
+
+    var p4=document.getElementById('p-4').checked;
+    if(p4){output+=" -p=lastn";}
+    
+    var p5=document.getElementById('p-5').checked;
+    if(p5){output+=" -p=lastp";}
+    
+    var p6=document.getElementById('p-6').checked;
+    if(p6){output+=" -p=rapsearch";}
+    
+    var p7=document.getElementById('p-7').checked;
+    if(p7){output+=" -p=mmseqsp";}
+    
+    var p8=document.getElementById('p-8').checked;
+    if(p8){output+=" -p=mmseqsn";}
+    
+    var p9=document.getElementById('p-9').checked;
+    if(p9){output+=" -p=topaz";}
+    
+    var p10=document.getElementById('p-10').checked;
+    if(p10){output+=" -p=usearch";}
+    
+    var p11=document.getElementById('p-11').checked;
+    if(p11){output+=" -p=ublast";}
+
+    var p12=document.getElementById('p-12').checked;
+    if(p12){output+=" -p=blatp";}
+
+    var p13=document.getElementById('p-13').checked;
+    if(p13){output+=" -p=blatn";}
+    
+    var ev=parseFloat(document.getElementById('e').value.replace(",","."));
+    if(ev != 0.00001 && ev != ""){output+=" -e="+ev;}
+
+    var sim=parseFloat(document.getElementById('sim').value.replace(",","."));
+    if(sim != 0.95 && sim != ""){output+=" -sim="+sim;}
+
+    var identity=parseFloat(document.getElementById('identity').value.replace(",","."));
+    if(identity != 25 && identity != ""){output+=" -identity="+identity;}
+
+    var cov=document.getElementById('cov').value.replace(",",".");
+    if(cov != 50 && cov != ""){output+=" -cov="+cov;}
+
+    var subparaBlast=document.getElementById('subparaBlast').value;
+    if(subparaBlast != ""){output+=" -subparaBlast='"+subparaBlast+"'";}
+
+    var synteny=document.getElementById('synteny-0').checked;
+    if(synteny){
+      document.getElementById('dups').disabled=false;
+      document.getElementById('cs').disabled=false;
+      document.getElementById('alpha').disabled=false;
+      output+=" -synteny";
+
+      var dups=document.getElementById('dups').value;
+      if(dups != 0 && dups != ""){output+=" -dups="+dups;}
+
+      var cs=document.getElementById('cs').value;
+      if(cs != 3 && cs != ""){output+=" -cs="+cs;}
+
+      var alpha=parseFloat(document.getElementById('alpha').value.replace(",","."));
+      if(alpha != 0.5 && alpha != ""){output+=" -alpha="+alpha;}
+
+    }else{
+      document.getElementById('dups').disabled=true;
+      document.getElementById('cs').disabled=true;
+      document.getElementById('alpha').disabled=true;
+    }
+
+    var conn=parseFloat(document.getElementById('conn').value.replace(",","."));
+    if(conn != 0.1 && conn != ""){output+=" -conn="+conn;}
+
+    var purity=parseFloat(document.getElementById('purity').value.replace(",","."));
+    if(purity != 0.0000001 && purity != ""){output+=" -purity="+purity;}
+
+    var minspecies=parseFloat(document.getElementById('minspecies').value.replace(",","."));
+    if(minspecies != 1 && minspecies != ""){output+=" -minspecies="+minspecies;}
+
+    var subparaCluster=document.getElementById('subparaCluster').value;
+    if(subparaCluster != ""){output+=" -subparaCluster='"+subparaCluster+"'";}
+
+    var nograph=document.getElementById('nograph').checked;
+    if(nograph){output+=" -nograph";}
+
+    var singles=document.getElementById('singles').checked;
+    if(singles){output+=" -singles";}
+
+    var xml=document.getElementById('xml').checked;
+    if(xml){output+=" -xml";}
+
+    var mcl=document.getElementById('mcl').checked;
+    if(mcl){output+=" -mcl";}
+    
+    var exactstep3=document.getElementById('exactstep3').checked;
+    if(exactstep3){output+=" -exactstep3";}
+    
+    if(document.getElementById('jobs').disabled){
+      document.getElementById('jobs').value="";
+    }
+
+    if(step2){
+
+      document.getElementById('jobs').disabled=false;
+      var jobs=parseInt(document.getElementById('jobs').value);
+      if(jobs){
+        var outputjobs="";
+        for(var i = 1 ; i < jobs+1; i++){
+          outputjobs+=output+" -jobs="+i+"/"+jobs+"\n";
+        }
+        output=outputjobs;
+      }else{
+       output+=fastas;
+      }
+    }else{
+      document.getElementById('jobs').disabled=true;
+      output+=fastas;
+    }
+    
+
+    document.getElementById('terminal').innerHTML= output;
+
+  }
+  updateTerminal();
+</script>
+</html>

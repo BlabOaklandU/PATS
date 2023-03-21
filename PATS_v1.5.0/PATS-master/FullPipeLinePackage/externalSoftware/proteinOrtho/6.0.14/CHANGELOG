@@ -1,0 +1,240 @@
+2010
+    12-17: Proteinortho V4.18 - Source code
+2011
+    01-12: Proteinortho V4.20 - Source code
+        Support for NCBI blast+
+        minor bugfixes
+    08-16: Proteinortho V4.22 - Source code
+        Added option to output the edge list for reciprocal blast alignments
+        Added script to output the remaining edge list after clustering
+        Added test+ option for make to run a test using blastp+ rather than blast+
+        Relaxed criteria for compilation test to deal with different versions of blast
+2012
+    05-01: Proteinortho V4.25 - Source code
+        Compatibility with newer blast+ v2.2.25
+        Compatibility with newer versions of gcc
+        Reduced default I/O-threads limit to 3
+        Some details for better looking output
+    06-05: Proteinortho V4.26 - Source code
+        Added -singles option, it allows to report single and paralogous genes found in one species only
+
+2013
+    12-17: Proteinortho V5.0 - Source code
+        PoFF extension added, which allows to incorporate conserved synteny data (-synteny, requires .gff files for gene positions)
+        Default E-value changed from 1e-10 to 1e-05
+        Partially reimplemented, more clear variable names and three step model (check/prepare, blast, cluster)
+        Changed parameter names (run without options to see manual)
+        Pairs will always be reported
+        Tree-like structures in the orthology graph are not pruned anymore
+2014
+    01-27: Proteinortho V5.02 - Source code
+        Added -selfblast option to improve prediction of paralogs
+    01-31: Proteinortho V5.03 - Source code (BETA)
+        Added -singles option to return singleton genes (orphans without any matches)
+        Improved multithreading: If more CPUs are present than required for blast jobs, blast's internal subthreads will be invoked
+        Improved output: When already present blast output was found, a note is raised to give feedback to the user
+    02-12: Proteinortho V5.04 - Source code
+        Fixed bugs in the selfblast implementation: Selfblast results obtained using V5.02 or V5.03 (BETA) should be reverified with this version!
+        -singles option will add data on singleton genes directly into the results matrix rather than to a separate file
+        Added tool to compare graph files (comp_bla.pl)
+    03-05: Proteinortho V5.05 - Source code
+        Fixed stalling issues for system calls; these could have prevented Proteinortho from finishing an analysis at all
+        Added -blastParameters option to define specific blast parameters other than E-Value
+        Added -clean switch, it removes temporary files automatically
+        Fixed some typos
+        Eased thread locking and terminating system
+        Added presort of blast results to speed up filtering
+        Proteinortho now also parses options when set via --
+    04-01: Proteinortho V5.06 - Source code
+        Made graph output optional: now it needs to be requested using the -graph switch
+        Added a new output file: XXX.descriptions containing ID DESC from FASTA files
+        Fixed some typos and description flaws
+        Tweaked Makefile
+        Special thanks for this update goes to Torsten Seemann, Victorian Bioinformatics Consortium at Monash University, Clayton
+    07-01: Proteinortho V5.07 - Source code
+        Added a more detailed manual
+        Added example data for test
+        Minor bugfixes in output data
+    07-26: Proteinortho V5.10 - Source code
+        speeded up graph processing (a lot)
+        improved make test and example files
+        fixed minor bugs in tool and manual
+        added some bugtracking output data to ease use
+    09-23: Proteinortho V5.11 - Source code
+        fixed bug when using -singles options with files subfolders
+2016
+    03-17: Proteinortho V5.12b - Source code
+        fixed Makefile (version b)
+        fixed code issue in tree builder that prevented it from compiling (version b)
+        fixed issue where clustering could take very long or even get stuck
+        improved clustering accuracy for small graphs
+        added feature to use user-defined temporary paths (-temp=[PATH])
+        adapted and re-added UPGMA-tree builder tool for protein presence/absence from the version 4 branch (po2tree)
+    04-26: Proteinortho V5.13 - Source code
+        fixed issue in graph clustering that sometimes led to random artefacts 
+        thanks to David Kraus (MPI Marburg) and Andrey Rozenberg (University of Bochum)
+        added hardening modifications for Makefile and added tree builder as install target 
+        thanks to Andreas Tille
+        Known issues: edges the cleaned graph file (proteinortho-graph) are not reliable at the moment (do not reflect in-program graph)
+    08-26: Proteinortho V5.15 - Source code with precompiled binaries (Linux/x64) / Proteinortho V5.15 - Source code only
+        output table is ordered by species names and gene names which largely increases readability and comparability
+        increased arithmetic accuracy of graph clustering
+        added warning before existing outputs are overwritten
+        added support for tblastx+ and tblastx legacy 
+        thanks to Clemens Thölken
+2018 Proteinortho6
+    20.Juni-4.Juli
+        openmp support (max_of_diag,get_new_x,makeOrthogonal,normalize,getY)
+        bitscore integration in the convergence (weighted algebraic connectivity)
+        protein output is now sorted in descending degree-order (sort with comparator_pairDoubleUInt)
+        getConnectivity: special case checks now if the induced subgraph is complete (K_n)
+        added various test functions
+    5. Juli
+        added kmere heuristic for splitting groups in proteinortho_clustering. After the calculation of an fiedler vector, the kmere heuristic splits the graph not only in the positive and negative entries of the vector but in k clusters. k=2 -> the original split (without the purity).  
+    16. Juli
+        added LAPACK support for CC with less than 2^15 nodes (since it uses quadratic space -> (2^15)^2=2^30) for the calculation of the algebraic connectivity.
+        added all other proteinortho files to this repository.
+        graphMinusRemoveGraph.cpp implements proteinortho5_clean_edges2.pl in c++
+    23.Juli
+        openMP support for laplacian declaration (for lapack).
+        'make test' clean up.
+        jackhmmer, phmmer, diamond, usearch support.
+    24 Juli
+        last integration.
+        phmmer+jackhmmer fix/workaround (there is no local identity in the output -> disabled).
+        proteinortho.pl : set cluster algorithm to weighted-mode as default.
+    30. Juli
+        rapsearch integration.
+        proteinortho_clustering.cpp : -ramLapack is now -ram and is the threshold for laplace matrix + graph struct. 
+        added dynamic memory management (proteinortho.pl + clustering.cpp) using the free -m command (if exists) 
+    31. Juli
+        rapsearch fix (wrong order of db and q)
+        purity is back, now 0.1 (and fallback function, if all nodes are below purity threshold -> remove purity for this connected component)
+        more options for proteinortho.pl -p=diamond-moresensitive|usearch-ublast
+    9. Aug
+        topaz integeration.
+        all DBs now have the blastmode in name (colliding names) as well as the tmp files generated by the blastalgos.
+    10. Aug
+        Orthology XML integration. Added the option -noxml for not generating the orthology XML format.
+    13. Aug
+        bugfix usearch/ublast: removed the description from the gene name (formatU.pl). bugfix rapsearch: forced to create an output .m8 file if there are no hits found.
+        allowedAlphabet check in read_details in check_files. E.g. diamond expects aminoacid characters -> found a gene with only nucleotide characters -> WARNING. E.g. blastn+ expects nucleotide characters -> found non nucleotide characters -> ERROR.
+    22. Aug
+        removed phmmer and jackhmmer. 
+        removed the -p=diamondmoresensitive option, since it is equivalent to -p=diamond -subpara='--moresensitive'.
+#           redesigned the multithreading system: 
+#            -cpus=x -> spawn round(sqrt(x)) workerthreads with each ceil(sqrt(x)) (different for the last workerthread ...) cores for blast. 
+#            removed threads_per_process function.
+    8. Sep
+        proteinortho_clustering: introduced multithreading in partition_graph() -> generate k CC and compute the lapack dsyevx in parallel (1. Memory check 2. if a large CC is found -> 1 power iteration with all cores 3. else do k lapack.). New const variable lapack_power_threshold_n for determining large CC for the power iteration.   
+    4. Okt
+        improvement in the memory calculations. 
+        BUGfix in the DFS calculation (recursion in c++ failed with segmentation fault if the recursion was too deep) -> now iteratively (memory ineffciently) with Queue
+    10. Okt
+        DFS -> BFS since recursive calls can only be so deep.
+    18.  Okt
+        purity is now 1e-7, evalue 1e-8 (http://people.sc.fsu.edu/~jburkardt/c_src/power_method/power_method_prb.c)
+        kmere heuristic minNodes = 2^20 (~1e+6), kmere now checks if the "normal" split would result in a good partition.
+    30. Okt
+        - removed the memory manager for proteinortho_clustering, instead a simple n threshold manages the power/lapack algorithms
+        now all CC are calculated for power/lapack (no frequent restart), dynamic for loop for lapack
+    7. Nov
+        dsyevr instead of dsyevx (rrr algorithm now)
+        remove graph bugfix (each thread is now assigned an own ofstream (shared_ptr needed -> c++11 needed))
+    13. Nov
+        OMP_PROC_BIND=close for multi-socket systems (change the cpu affinity of openmp to close -> each new thread spawn next to the last one, instead of randomly)
+    15. Nov
+        Blat support (step=2), the evalues cannot be preset as a parameter but appear if -out=blast8 is set.
+    16. Nov
+        proteinoprtho 6.0 alpha release
+    28. Nov
+        Makefile update (lapack zipped,...)
+    5. Dez
+        MCL integration (-mcl option in proteinortho.pl)
+        XML bugfix (species with . in the name did confuse the xml parser)
+    6. Dez
+        MCL pre/postprocessing (src/do_mcl.pl)
+        double -> float in proteinortho_clustering.cpp
+        weights are unsigned shorts again (only the last commit was unsigned int) proteinortho_clustering.cpp
+    10. Dez
+        gff4fasta update: Test for additional naming schemes
+    20.-21. Dez
+        src/do_mcl.pl performance increase, dev/blastgraph2CCblastgraphs.cpp improvement
+        orthoXML improvement (still not accepted by orthobechmarkproject)
+    25. Dez
+        no lapack version (src/proteinortho_clustering_nolapack.cpp)
+        no cmake version (make all_nocmake, needs lapack installed)
+2019
+    9. Jan
+        pow_n replaced with powLapD (graph density threshold instead of number of nodes)
+    11. Jan
+        mmseq2 integration (proteinortho.pl) -p=mmseqsp or mmseqsn 
+    22. Jan (uid:296)
+        Added CHAGEUID for a commit specific id. (update_CHANGEUID.sh can be found in snippets, use 'find . -maxdepth 2 | perl -lne '{if($_=~m/^.*(\.pl|\.cpp|\.c|\.h|\.md|\.txt|Makefile|CHANGELOG)$/){print $_;}}' | entr bash update_CHANGEUID.sh')
+        BUGfix: weird sort behaviour dependant on locale (LC_All,LC_NUMERIC). Fix: $ENV{'LC_All'}='C';
+    23. Jan (uid:492) v6.0a
+        small fix for get_po_path
+    4. Feb (uid:724)
+        -ram is back for memory control of proteinortho_clustering (restricts the memory usage of LAPACK and the input graph), works also for proteinortho.pl -ram
+    14. Mar (uid: 1034)
+        -tmp is now working better (tmp_dir now generates a directory with all temporary files inside)
+        read_details now checks if the input files are faa and fna type based on the -p algorithm (diamond only uses faa files etcpp) IF -checkfasta
+    20. Mar (uid: 1174)
+        static versions (Linux/x64) of all binaries are now included in the repository
+        Makefile now compiles first against /usr/lib/liblapack statically then it tries to recompile src/lapack automatically with 'make'
+    26. Apr (uid: 2239)
+    	now supports -minspecies fully (proteinortho.pl argument)
+    	fix no_lapack_proteinortho_clustering
+    	po2html integration
+    28. Apr (uid:2349)
+	    Makefile now builds in src/BUILDS/$uname depending on the system (Linux/Darvin). Now I can include precompiled binaries for mac and linus at the same time.
+    1. Mai (uid:2488) v6.0b
+    	proteinortho is now part of the bioconda repository
+    	grab_proteins.pl makeover for brew integration
+    6. Mai (uid:2821) v6.0
+	    finally proteinortho2xml.pl is working correctly.
+        clean up proteinortho_do_mcl.pl
+        renamed all files, such that every program starts with proteinortho !
+    11. Mai (uid:3023) v6.0.1
+        html improvement (now you can display alternative names from the fasta files)
+        new minspecies default (1)
+    19. Mai (uid:3063)
+        proteinorthoHelper.html
+    21. Mai (uid:3080)
+	    minspecies 1 fix (previously 1 => disabled minspecies calculations)
+    22. Mai (uid:3140)
+	    -selfblast generates duplicated hits -> automatically calls cleanupblastgraph
+    3. Juni (uid:3142)
+	    refined error messages on duplicated inputs, <2 inputs
+    27. Juni (uid:3492)
+        proteinortho6.pl now writes databases (-step=1) into -tmp directory if system call failed.
+        fixed small issue that tmp directories are created inside eachother. 
+        better stderr outputs e.g. if blast fails -> try -check ...
+    1. Juli (uid:3511)
+	    fixed the -ram issue (used free memory, now total memory) in case there is a swap using up all free memory (also proteinortho_clustering now throws a warning not a error)
+    10. Juli (uid:3697)
+        fixed proteinortho_grab_proteins.pl: -tofiles option now escapes if -exact, replaced chomp with s/[\r\n]+$//
+        proteinortho_grab_proteins.pl speedup for -exact and a given proteinortho file
+        proteinortho6.pl replaced chomp with s/[\r\n]+$//
+        proteinortho_clustering.cpp fix bug that only uses lapack if -pld is set, regardless of the value.
+    11. Sept (uid: 3813)
+		updated shebang of ffadj such that python2.7 is used directly (ffadj fails if called with higher version of python)
+		-p=blastp is now alias of blastp+ and legacy blast is now -p=blastp_legacy (blastn is equivalent)
+		Makefile: static now includes -lquadmath
+    25. Sept (uid: 3899)
+		synteny update to python3 (but the code looks fishy, the -synteny option now gets a deprecated warning)
+		proteinortho now only print html for <10 files automatically and otherwise only gives the option
+    4. Nov (uid: 4020)
+		FIXED: sometimes the python3 version produces one edditional edge (global defintion of ALPHA). Special thanks for this update goes to Daniel Doerr for fixing this.
+	25. Nov (uid: 4030)
+		added proteinortho_history
+		the synteny option ffadj is now not depricated anymore
+    10. Dec (uid: 4196)
+    	improved proteinortho_history
+    	removed the new diamond spam
+        + added proteinortho_summary.pl for a summary of proteinortho-graph on species level.
+    24. Jan (uid: 4699)
+        added the -isoform option 
+        added -p=autoblast
+    6. Feb (uid: 4745)
+	autoblast and -cov now are working together (nucl vs prot -> coverage is in aa length, nucl vs nucl -> cov is in nucl lengths, converted all lengths to aa and alignmentlen/3 for nucl vs nucl)

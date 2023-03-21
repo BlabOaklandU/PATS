@@ -1,0 +1,287 @@
+variables:
+  PROJECT_NAME: "Proteinortho"
+before_script:
+  - echo "starting yml for Proteinortho"
+  - alias python=python3
+  - DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install cmake diffutils wget ncbi-blast+ time git python3 libblas-dev liblapack-dev
+stages:
+#  - test
+  - test-precompiled-bins
+  - recompile-and-test
+ 
+gcc-latest-manyoptions-together:
+  retry: 2
+  image: gcc
+  stage: test-precompiled-bins
+  script:
+  - echo "installing diamond"
+  - wget http://github.com/bbuchfink/diamond/releases/download/v2.0.6/diamond-linux64.tar.gz 2>/dev/null
+  - tar xzf diamond-linux64.tar.gz
+  - cp diamond $HOME
+  - export PATH="$PATH:$HOME"
+  - perl proteinortho*pl -project=testasd -range=50 -cpus=1 -ram=1 -verbose=1 -force -desc -checkfasta -cleanblast -e=0.000001 -sim=0.98 -identity=20 -cov=30 -subparaBlast='--more-sensitive' -synteny -dups=1 -cs=4 -alpha=0.4 -conn=0.01 -purity=0.00001 -minspecies=2 -subparaCluster='-cpus 1 -seed 1 -powLapD 10' -nograph -singles -xml -exactstep3 test/*faa || exit 1
+  - rm *info;
+  - for f in testasd.*; do if [ "$(grep -v '#' $f | wc -l | awk '{print $1}' | tr -d '\n')" -lt 10 ]; then echo "$f failed size check, output should be more than 10 lines..."; exit 1; fi; done
+  - rm *descriptions *html *xml; 
+
+gcc-latest-someoptions-one-by-one:
+  retry: 2
+  image: gcc
+  stage: test-precompiled-bins
+  script:
+  - echo "installing diamond"
+  - wget http://github.com/bbuchfink/diamond/releases/download/v2.0.6/diamond-linux64.tar.gz 2>/dev/null
+  - tar xzf diamond-linux64.tar.gz
+  - cp diamond $HOME
+  - export PATH="$PATH:$HOME"
+  - perl proteinortho*pl -synteny test/*faa || exit 1
+  - rm *info; 
+  - for f in myproject.*; do if [ "$(grep -v '#' $f | wc -l | awk '{print $1}' | tr -d '\n')" -lt 10 ]; then echo "$f failed size check, output should be more than 10 lines..."; exit 1; fi; done
+  - rm myproject*; 
+  - perl proteinortho*pl -selfblast test/*faa || exit 1
+  - rm *info; 
+  - for f in myproject.*; do if [ "$(grep -v '#' $f | wc -l | awk '{print $1}' | tr -d '\n')" -lt 10 ]; then echo "$f failed size check, output should be more than 10 lines..."; exit 1; fi; done
+  - rm myproject*; 
+  - perl proteinortho*pl -conn=1 test/*faa || exit 1
+  - rm *info; 
+  - for f in myproject.*; do if [ "$(grep -v '#' $f | wc -l | awk '{print $1}' | tr -d '\n')" -lt 10 ]; then echo "$f failed size check, output should be more than 10 lines..."; exit 1; fi; done
+  - rm myproject*; 
+  - perl proteinortho*pl -sim=1 test/*faa || exit 1
+  - rm *info; 
+  - for f in myproject.*; do if [ "$(grep -v '#' $f | wc -l | awk '{print $1}' | tr -d '\n')" -lt 10 ]; then echo "$f failed size check, output should be more than 10 lines..."; exit 1; fi; done
+  - rm myproject*; 
+  - perl proteinortho*pl -singles test/*faa || exit 1
+  - rm *info; 
+  - for f in myproject.*; do if [ "$(grep -v '#' $f | wc -l | awk '{print $1}' | tr -d '\n')" -lt 10 ]; then echo "$f failed size check, output should be more than 10 lines..."; exit 1; fi; done
+  - rm myproject*; 
+  - perl proteinortho*pl -project="weirdname.,:_+#*\$ ?.,($&)" test/*faa || exit 1
+  - rm *info; 
+  - for f in weirdname.*; do if [ "$(grep -v '#' $f | wc -l | awk '{print $1}' | tr -d '\n')" -lt 10 ]; then echo "$f failed size check, output should be more than 10 lines..."; exit 1; fi; done
+  - rm weirdname*; 
+  - perl proteinortho*pl -identical test/*faa || exit 1
+  - rm *info; 
+  - for f in myproject.*; do if [ "$(grep -v '#' $f | wc -l | awk '{print $1}' | tr -d '\n')" -lt 1 ]; then echo "$f failed size check, output should be more than 10 lines..."; exit 1; fi; done
+  - rm myproject*; 
+  - perl proteinortho*pl -core test/*faa || exit 1
+  - rm *info; 
+  - for f in myproject.*; do if [ "$(grep -v '#' $f | wc -l | awk '{print $1}' | tr -d '\n')" -lt 1 ]; then echo "$f failed size check, output should be more than 10 lines..."; exit 1; fi; done
+ 
+gcc-latest-all-p:
+  retry: 2
+  image: gcc
+  stage: recompile-and-test
+  script:
+  - export CWD=$(pwd)
+  - echo "installing last"
+  - wget http://last.cbrc.jp/last-982.zip 2>/dev/null && unzip last*zip 2>/dev/null && cd last*/ && make && cp src/last* $HOME
+  - cd $CWD && echo "installing usearch"
+  - curl https://drive5.com/cgi-bin/upload3.py?license=2019070410321731111 --output $HOME/usearch && chmod +x $HOME/usearch
+  - cd $CWD && echo "installing mmseqs2"
+  - git clone https://github.com/soedinglab/MMseqs2 && cd MMs* && cmake . && make && cp src/mmseqs $HOME && cd ..
+  - cd $CWD && echo "installing blat"
+  - wget http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64.v369/blat/blat 2>/dev/null && cp blat $HOME && chmod +x $HOME/blat
+  - cd $CWD && echo "installing topaz"
+  - git clone https://github.com/ajm/topaz && cd topaz/src && make && cp topaz $HOME && cd ../..
+  - cd $CWD && echo "installing diamond"
+  - wget http://github.com/bbuchfink/diamond/releases/download/v2.0.6/diamond-linux64.tar.gz 2>/dev/null && tar xzf diamond-linux64.tar.gz && cp diamond $HOME
+  - export PATH="$PATH:$HOME"
+  - echo "start proteinortho tests"
+  - gcc --version
+  - make clean
+  - make all
+  - make test
+  - perl proteinortho*pl test/*faa || exit 1
+  - rm *info; 
+  - for f in myproject.*; do if [ "$(grep -v '#' $f | wc -l | awk '{print $1}' | tr -d '\n')" -lt 10 ]; then echo "$f failed size check, output should be more than 10 lines..."; exit 1; fi; done
+
+gcc-latest-diamond:
+  retry: 2
+  image: gcc
+  stage: test-precompiled-bins
+  script:
+  - echo "installing diamond"
+  - wget http://github.com/bbuchfink/diamond/releases/download/v2.0.6/diamond-linux64.tar.gz 2>/dev/null
+  - tar xzf diamond-linux64.tar.gz
+  - cp diamond $HOME
+  - export PATH="$PATH:$HOME"
+  - echo "start proteinortho tests"
+  - gcc --version
+  - make test
+  - perl proteinortho*pl test/*faa || exit 1
+  - rm *info; 
+  - for f in myproject.*; do if [ "$(grep -v '#' $f | wc -l | awk '{print $1}' | tr -d '\n')" -lt 10 ]; then echo "$f failed size check, output should be more than 10 lines..."; exit 1; fi; done
+
+#gcc6:
+#  retry: 2
+#  image: gcc:6
+#  stage: recompile-and-test
+#  script:
+#  - echo "installing topaz"
+#  - git clone https://github.com/ajm/topaz
+#  - cd topaz/src
+#  - make
+#  - cp topaz $HOME
+#  - echo "installing diamond"
+#  - wget http://github.com/bbuchfink/diamond/releases/download/v2.0.6/diamond-linux64.tar.gz 2>/dev/null
+#  - tar xzf diamond-linux64.tar.gz
+#  - cp diamond $HOME
+#  - export PATH="$PATH:$HOME"
+#  - cd ../..
+#  - echo "start proteinortho tests"
+#  - gcc --version
+#  - make clean
+#  - make all
+#  - make test
+ 
+ubuntu-latest-precompiled:
+  retry: 2
+  image: ubuntu
+  stage: test-precompiled-bins
+  script:  
+  - DEBIAN_FRONTEND=noninteractive apt-get -y update && DEBIAN_FRONTEND=noninteractive apt-get -y install python2.7-minimal gcc gfortran build-essential g++ python3
+  - echo "installing topaz"
+  - git clone https://github.com/ajm/topaz
+  - cd topaz/src
+  - make
+  - cp topaz $HOME
+  - cd ../..
+  - echo "installing diamond"
+  - wget http://github.com/bbuchfink/diamond/releases/download/v2.0.6/diamond-linux64.tar.gz 2>/dev/null
+  - tar xzf diamond-linux64.tar.gz
+  - cp diamond $HOME
+  - export PATH="$PATH:$HOME"
+  - echo "start proteinortho tests"
+  - make test
+  - perl proteinortho*pl test/*faa || exit 1
+  - rm *info; 
+  - for f in myproject.*; do if [ "$(grep -v '#' $f | wc -l | awk '{print $1}' | tr -d '\n')" -lt 10 ]; then echo "$f failed size check, output should be more than 10 lines..."; exit 1; fi; done
+
+ubuntu-latest:
+  retry: 2
+  image: ubuntu
+  stage: recompile-and-test
+  script:
+  - apt-get -y update && apt-get -y install gcc && apt-get -y install gfortran && apt-get -y install build-essential g++ && apt-get -y install python3
+  - echo "installing topaz"
+  - git clone https://github.com/ajm/topaz
+  - cd topaz/src
+  - make
+  - cp topaz $HOME
+  - cd ../..
+  - echo "installing diamond"
+  - wget http://github.com/bbuchfink/diamond/releases/download/v2.0.6/diamond-linux64.tar.gz 2>/dev/null
+  - tar xzf diamond-linux64.tar.gz
+  - cp diamond $HOME
+  - export PATH="$PATH:$HOME"
+  - echo "start proteinortho tests"
+  - make clean
+  - make all
+  - make test
+  - perl proteinortho*pl test/*faa || exit 1
+  - rm *info; 
+  - for f in myproject.*; do if [ "$(grep -v '#' $f | wc -l | awk '{print $1}' | tr -d '\n')" -lt 10 ]; then echo "$f failed size check, output should be more than 10 lines..."; exit 1; fi; done
+
+debian-latest:
+  retry: 2
+  image: debian
+  stage: recompile-and-test
+  script:
+  - apt-get -y update && apt-get -y install gcc && apt-get -y install gfortran && apt-get -y install build-essential g++ && apt-get -y install python3
+  - echo "installing topaz"
+  - git clone https://github.com/ajm/topaz
+  - cd topaz/src
+  - make
+  - cp topaz $HOME
+  - echo "installing diamond"
+  - wget http://github.com/bbuchfink/diamond/releases/download/v2.0.6/diamond-linux64.tar.gz 2>/dev/null
+  - tar xzf diamond-linux64.tar.gz
+  - cp diamond $HOME
+  - export PATH="$PATH:$HOME"
+  - cd ../..
+  - echo "start proteinortho tests"
+  - make clean
+  - make all
+  - make test
+  - perl proteinortho*pl test/*faa || exit 1
+  - rm *info; 
+  - for f in myproject.*; do if [ "$(grep -v '#' $f | wc -l | awk '{print $1}' | tr -d '\n')" -lt 10 ]; then echo "$f failed size check, output should be more than 10 lines..."; exit 1; fi; done
+
+# fedora-latest:
+#   retry: 2
+#   image: fedora
+#   stage: test
+#   script:
+#   - yum -y groupinstall "Development Tools" 
+#   - yum -y install gcc-c++
+#   - yum -y install cmake
+#   - yum -y install make
+#   - yum -y install tar
+#   - yum -y install which
+#   - yum -y install wget
+#   - yum -y install libstdc++-static
+#   - yum -y install lapack-static
+#   - yum -y install cpan
+#   - yum -y install python
+#   - yum -y install ncbi-blast+
+#   - cpan Thread::Queue
+#   - wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast*-x64-linux.tar.gz 2>/dev/null
+#   - tar -xzvf ncbi-blast*-x64-linux.tar.gz
+#   - cp ncbi-blast*/bin/blastp $HOME
+#   - cp ncbi-blast*/bin/makeblastdb $HOME
+#   - echo "installing diamond"
+#   - wget http://github.com/bbuchfink/diamond/releases/download/v2.0.6/diamond-linux64.tar.gz 2>/dev/null
+#   - tar xzf diamond-linux64.tar.gz
+#   - cp diamond $HOME
+#   - export PATH="$PATH:$HOME"
+#   - echo "start proteinortho tests"
+
+# centos-latest:
+#   retry: 2
+#   image: centos
+#   stage: test
+#   script:
+#   - yum -y groupinstall "Development Tools" 
+#   - yum -y install gcc-c++
+#   - yum -y install cmake
+#   - yum -y install make
+#   - yum -y install tar
+#   - yum -y install which
+#   - yum -y install wget
+#   - yum -y install gcc-gfortran python3 atlas atlas-devel lapack blas
+#   - wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast*-x64-linux.tar.gz 2>/dev/null
+#   - tar -xzvf ncbi-blast*-x64-linux.tar.gz
+#   - cp ncbi-blast*/bin/blastp $HOME
+#   - cp ncbi-blast*/bin/makeblastdb $HOME
+#   - echo "installing diamond"
+#   - wget http://github.com/bbuchfink/diamond/releases/download/v2.0.6/diamond-linux64.tar.gz 2>/dev/null
+#   - tar xzf diamond-linux64.tar.gz
+#   - cp diamond $HOME
+#   - export PATH="$PATH:$HOME"
+#   - echo "start proteinortho tests"
+#   - make clean
+#   - make
+#   - make test
+#   - perl proteinortho*pl test/*faa || exit 1
+#   - rm *info; 
+#   - for f in myproject.*; do if [ "$(grep -v '#' $f | wc -l | awk '{print $1}' | tr -d '\n')" -lt 10 ]; then echo "$f failed size check, output should be more than 10 lines..."; exit 1; fi; done
+ 
+#code_quality:
+#  retry: 2  
+#  image: docker:stable
+#  stage: codequality
+#  variables:
+#    DOCKER_DRIVER: overlay2
+#  allow_failure: true
+#  services:
+#    - docker:stable-dind
+#  script:
+#    - export SP_VERSION=$(echo "$CI_SERVER_VERSION" | sed 's/^\([0-9]*\)\.\([0-9]*\).*/\1-\2-stable/')
+#    - docker run
+#        --env SOURCE_CODE="$PWD"
+#        --volume "$PWD":/code
+#        --volume /var/run/docker.sock:/var/run/docker.sock
+#        "registry.gitlab.com/gitlab-org/security-products/codequality:$SP_VERSION" /code
+#    - cat *.json
+  # artifacts:
+  #   reports:
+  #     codequality: gl-code-quality-report.json

@@ -1,0 +1,57 @@
+cluster_n*
+.nfs00*
+mcl.*
+src/lapack-3.8.0/
+myproject.*
+.Rhistory
+old/
+remove.graph*
+test/*.dmnd
+test/*.pin
+test/*.phr
+test/*.psq
+test.*
+.log
+
+*cache*
+dev/*
+backup/*
+
+*_old*
+
+test*
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# =========================
+# Operating System Files
+# =========================
+
+# OSX
+# =========================
+
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# CMake files
+CMakeCache.txt
+CMakeFiles
+cmake_install.cmake
+install_manifest.txt
+

@@ -1,0 +1,227 @@
+variables:
+  PROJECT_NAME: "Proteinortho"
+before_script:
+  - echo "starting yml for Proteinortho"
+  - apt-get update && apt-get -y install cmake diffutils wget ncbi-blast+ time git python3
+stages:
+  - codequality
+  - test-precompiled-bins
+  - recompile-and-test
+
+gcc-latest-alloptions:
+  image: gcc
+  stage: test-precompiled-bins
+  script:
+  - echo "installing diamond"
+  - wget http://github.com/bbuchfink/diamond/releases/download/v0.9.24/diamond-linux64.tar.gz
+  - tar xzf diamond-linux64.tar.gz
+  - mkdir ~/bin
+  - cp diamond ~/bin
+  - perl proteinortho*pl -project=testasd -cpus=1 -ram=100 -verbose=2 -selfblast -silent -force -desc -checkfasta -cleanblast -debug -binpath=~/bin -tmp='~/' -e=0.000001 -sim=0.9 -identity=20 -cov=30 -subparaBlast='--more-sensitive' -synteny -dups=1 -cs=4 -alpha=0.4 -conn=0.01 -purity=0.00001 -minspecies=2 -subparaCluster='-cpus 1 -seed 1' -nograph -singles -xml -exactstep3 test/*faa >/dev/null 2>&1 && rm testasd*poff* && rm testasd*fadj* && rm testasd*info* && export LC_NUMERIC="C" && export LC_ALL="C" && rm *descriptions* && rm *proteinortho.html* && rm *summary* && for f in testasd.*; do sort $f >$f.testasd; done; sha256sum -b *testasd | tr -d '\n' | awk '{if($0 == "fa18e9a0530f5a5754f045cfe97deaf818bdb5eb725619952633f1da0641cf7b *testasd.proteinortho.tsv.testasdc598b8c43e48e06614ec19e2f6b870e2737a7117a50ab2b1613880764d0884b2 *testasd.proteinortho.tsv.xml.testasd"){print $0." -> OK"; exit 0}else{print $0." -> failed"; exit 1}}'
+
+gcc-latest-all-p:
+  image: gcc
+  stage: recompile-and-test
+  script:
+  - export CWD=$(pwd)
+  - echo "installing last"
+  - wget http://last.cbrc.jp/last-982.zip && unzip last*zip 2>/dev/null && cd last*/ && make && cp src/last* $HOME
+  - cd $CWD && echo "installing usearch"
+  - curl https://drive5.com/cgi-bin/upload3.py?license=2019070410321731111 --output $HOME/usearch && chmod +x $HOME/usearch
+  - cd $CWD && echo "installing mmseqs2"
+  - git clone https://github.com/soedinglab/MMseqs2 && cd MMs* && cmake . && make && cp src/mmseqs $HOME && cd ..
+  - cd $CWD && echo "installing blat"
+  - wget http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64.v369/blat/blat && cp blat $HOME && chmod +x $HOME/blat
+  - cd $CWD && echo "installing topaz"
+  - git clone https://github.com/ajm/topaz && cd topaz/src && make && cp topaz $HOME && cd ../..
+  - cd $CWD && echo "installing diamond"
+  - wget http://github.com/bbuchfink/diamond/releases/download/v0.9.24/diamond-linux64.tar.gz && tar xzf diamond-linux64.tar.gz && cp diamond $HOME
+  - export PATH="$PATH:$HOME"
+  - echo "start proteinortho tests"
+  - gcc --version
+  - make clean
+  - make all
+  - make test
+
+gcc-latest-diamond:
+  image: gcc
+  stage: test-precompiled-bins
+  script:
+  - echo "installing diamond"
+  - wget http://github.com/bbuchfink/diamond/releases/download/v0.9.24/diamond-linux64.tar.gz
+  - tar xzf diamond-linux64.tar.gz
+  - cp diamond $HOME
+  - export PATH="$PATH:$HOME"
+  - echo "start proteinortho tests"
+  - gcc --version
+  - make test
+
+nolapack-gcc-latest:
+  image: gcc
+  stage: recompile-and-test
+  script:
+  - echo "installing diamond"
+  - wget http://github.com/bbuchfink/diamond/releases/download/v0.9.24/diamond-linux64.tar.gz
+  - tar xzf diamond-linux64.tar.gz
+  - cp diamond $HOME
+  - export PATH="$PATH:$HOME"
+  - echo "start proteinortho tests"
+  - gcc --version
+  - make clean
+  - make LAPACK=FALSE
+  - make test
+
+gcc5:
+  image: gcc:5
+  stage: recompile-and-test
+  script:
+  - echo "installing topaz"
+  - git clone https://github.com/ajm/topaz
+  - cd topaz/src
+  - make
+  - cp topaz $HOME
+  - echo "installing diamond"
+  - wget http://github.com/bbuchfink/diamond/releases/download/v0.9.24/diamond-linux64.tar.gz
+  - tar xzf diamond-linux64.tar.gz
+  - cp diamond $HOME
+  - export PATH="$PATH:$HOME"
+  - cd ../..
+  - echo "start proteinortho tests"
+  - gcc --version
+  - make clean
+  - make all
+  - make test
+ 
+ubuntu-latest0:
+  image: ubuntu
+  stage: test-precompiled-bins
+  script:
+  - apt-get -y update && apt-get -y install gcc && apt-get -y install gfortran && apt-get -y install build-essential g++ && apt-get -y install python3
+  - echo "installing topaz"
+  - git clone https://github.com/ajm/topaz
+  - cd topaz/src
+  - make
+  - cp topaz $HOME
+  - cd ../..
+  - echo "installing diamond"
+  - wget http://github.com/bbuchfink/diamond/releases/download/v0.9.24/diamond-linux64.tar.gz
+  - tar xzf diamond-linux64.tar.gz
+  - cp diamond $HOME
+  - export PATH="$PATH:$HOME"
+  - echo "start proteinortho tests"
+  - make test
+
+ubuntu-latest:
+  image: ubuntu
+  stage: recompile-and-test
+  script:
+  - apt-get -y update && apt-get -y install gcc && apt-get -y install gfortran && apt-get -y install build-essential g++ && apt-get -y install python3
+  - echo "installing topaz"
+  - git clone https://github.com/ajm/topaz
+  - cd topaz/src
+  - make
+  - cp topaz $HOME
+  - cd ../..
+  - echo "installing diamond"
+  - wget http://github.com/bbuchfink/diamond/releases/download/v0.9.24/diamond-linux64.tar.gz
+  - tar xzf diamond-linux64.tar.gz
+  - cp diamond $HOME
+  - export PATH="$PATH:$HOME"
+  - echo "start proteinortho tests"
+  - make clean
+  - make all
+  - make test
+
+debian-latest:
+  image: debian
+  stage: recompile-and-test
+  script:
+  - apt-get -y update && apt-get -y install gcc && apt-get -y install gfortran && apt-get -y install build-essential g++ && apt-get -y install python3
+  - echo "installing topaz"
+  - git clone https://github.com/ajm/topaz
+  - cd topaz/src
+  - make
+  - cp topaz $HOME
+  - echo "installing diamond"
+  - wget http://github.com/bbuchfink/diamond/releases/download/v0.9.24/diamond-linux64.tar.gz
+  - tar xzf diamond-linux64.tar.gz
+  - cp diamond $HOME
+  - export PATH="$PATH:$HOME"
+  - cd ../..
+  - echo "start proteinortho tests"
+  - make clean
+  - make all
+  - make test
+
+#fedora-latest:
+#  image: fedora
+#  stage: test-precompiled-bins
+#  script:
+#  - yum -y groupinstall "Development Tools" 
+#  - yum -y install gcc-c++
+#  - yum -y install cmake
+#  - yum -y install make
+#  - yum -y install tar
+#  - yum -y install which
+#  - yum -y install wget
+#  - yum -y install libstdc++-static
+#  - yum -y install lapack-static
+#  - yum -y install cpan
+#  - yum -y install python
+#  - yum -y install ncbi-blast+
+#  - cpan Thread::Queue
+#  - wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast*-x64-linux.tar.gz
+#  - tar -xzvf ncbi-blast*-x64-linux.tar.gz
+#  - cp ncbi-blast*/bin/blastp $HOME
+#  - cp ncbi-blast*/bin/makeblastdb $HOME
+#  - echo "installing diamond"
+#  - wget http://github.com/bbuchfink/diamond/releases/download/v0.9.24/diamond-linux64.tar.gz
+#  - tar xzf diamond-linux64.tar.gz
+#  - cp diamond $HOME
+#  - export PATH="$PATH:$HOME"
+#  - echo "start proteinortho tests"
+
+centos-latest:
+  image: centos
+  stage: recompile-and-test
+  script:
+  - yum -y groupinstall "Development Tools" 
+  - yum -y install gcc-c++
+  - yum -y install cmake
+  - yum -y install make
+  - yum -y install tar
+  - yum -y install which
+  - yum -y install wget
+  - yum -y install gcc-gfortran
+  - wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast*-x64-linux.tar.gz
+  - tar -xzvf ncbi-blast*-x64-linux.tar.gz
+  - cp ncbi-blast*/bin/blastp $HOME
+  - cp ncbi-blast*/bin/makeblastdb $HOME
+  - echo "installing diamond"
+  - wget http://github.com/bbuchfink/diamond/releases/download/v0.9.24/diamond-linux64.tar.gz
+  - tar xzf diamond-linux64.tar.gz
+  - cp diamond $HOME
+  - export PATH="$PATH:$HOME"
+  - echo "start proteinortho tests"
+  - make clean
+  - make
+ 
+code_quality:
+  image: docker:stable
+  stage: codequality
+  variables:
+    DOCKER_DRIVER: overlay2
+  allow_failure: true
+  services:
+    - docker:stable-dind
+  script:
+    - export SP_VERSION=$(echo "$CI_SERVER_VERSION" | sed 's/^\([0-9]*\)\.\([0-9]*\).*/\1-\2-stable/')
+    - docker run
+        --env SOURCE_CODE="$PWD"
+        --volume "$PWD":/code
+        --volume /var/run/docker.sock:/var/run/docker.sock
+        "registry.gitlab.com/gitlab-org/security-products/codequality:$SP_VERSION" /code
+    - cat *.json
+  # artifacts:
+  #   reports:
+  #     codequality: gl-code-quality-report.json
